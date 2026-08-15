@@ -1,48 +1,33 @@
-import { ScrollView, Text, View, TouchableOpacity } from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useRouter } from "expo-router";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { Card, Pill, PrimaryButton, ProgressBar, ReadinessGauge, colors } from "@/components/passsafe-ui";
 import { ScreenContainer } from "@/components/screen-container";
+import { usePassSafe } from "@/lib/passsafe-context";
+import { filteredQuestions, getQuestionTopics } from "@/lib/passsafe-data";
+import { startSession } from "@/lib/session-store";
 
-/**
- * Home Screen - NativeWind Example
- *
- * This template uses NativeWind (Tailwind CSS for React Native).
- * You can use familiar Tailwind classes directly in className props.
- *
- * Key patterns:
- * - Use `className` instead of `style` for most styling
- * - Theme colors: use tokens directly (bg-background, text-foreground, bg-primary, etc.); no dark: prefix needed
- * - Responsive: standard Tailwind breakpoints work on web
- * - Custom colors defined in tailwind.config.js
- */
 export default function HomeScreen() {
+  const router = useRouter();
+  const { t, certTrack, readiness, progress, usage, language, examDate } = usePassSafe();
+  const total = filteredQuestions(certTrack).length;
+  const weakTopics = getQuestionTopics(certTrack).map(({ topic }) => ({ topic, score: progress[topic] ? Math.round((progress[topic].correct / progress[topic].total) * 100) : 0 })).sort((a, b) => a.score - b.score).slice(0, 2);
+  const start = (mode: "quick" | "night") => { const session = startSession(mode, certTrack); router.push({ pathname: "/session" as never, params: { id: session.id } } as never); };
   return (
-    <ScreenContainer className="p-6">
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="flex-1 gap-8">
-          {/* Hero Section */}
-          <View className="items-center gap-2">
-            <Text className="text-4xl font-bold text-foreground">Welcome</Text>
-            <Text className="text-base text-muted text-center">
-              Edit app/(tabs)/index.tsx to get started
-            </Text>
-          </View>
-
-          {/* Example Card */}
-          <View className="w-full max-w-sm self-center bg-surface rounded-2xl p-6 shadow-sm border border-border">
-            <Text className="text-lg font-semibold text-foreground mb-2">NativeWind Ready</Text>
-            <Text className="text-sm text-muted leading-relaxed">
-              Use Tailwind CSS classes directly in your React Native components.
-            </Text>
-          </View>
-
-          {/* Example Button */}
-          <View className="items-center">
-            <TouchableOpacity className="bg-primary px-6 py-3 rounded-full active:opacity-80">
-              <Text className="text-background font-semibold">Get Started</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+    <ScreenContainer style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}><View><Text style={styles.greeting}>{t("goodMorning")} Alex</Text><Text style={styles.scoreTitle}>{t("readinessScore")}</Text></View><View style={styles.headerRight}><Pill label={usage.isPro ? "PRO" : `${usage.answeredToday}/${50 + usage.rewardedUnlocks * 10}`} tone="green" /><MaterialIcons name="notifications-none" size={24} color={colors.text} /></View></View>
+        <Card style={styles.gaugeCard}><ReadinessGauge value={readiness} /><Text style={styles.gaugeMessage}>{readiness >= 75 ? "Almost ready" : "Build your momentum"} — {Math.max(0, 75 - readiness)}% from passing</Text><Text style={styles.gaugeHint}>You need 75% to pass</Text>{examDate ? <View style={styles.examNote}><MaterialIcons name="event" size={15} color="#B45309" /><Text style={styles.examText}>Exam date set: {examDate}</Text></View> : <View style={styles.examNote}><MaterialIcons name="calendar-today" size={15} color="#B45309" /><Text style={styles.examText}>Set an exam date in Profile to personalize your plan.</Text></View>}</Card>
+        <Card style={styles.dailyCard}><View style={styles.dailyLine}><View style={styles.dailyCopy}><Text style={styles.cardTitle}>{t("todayQuestions")}</Text><Text style={styles.cardSubtitle}>{total} Qs · ~8 min · {language.toUpperCase()} · FDA Glossary</Text></View><View style={styles.roundArrow}><MaterialIcons name="arrow-forward" size={19} color="#FFFFFF" /></View></View><View style={styles.dailyAction}><PrimaryButton label="Start today’s set" onPress={() => start("quick")} /></View></Card>
+        <Card style={styles.drillCard}><View style={styles.cardHeader}><View><Text style={styles.cardTitle}>2-Minute Drill</Text><Text style={styles.cardSubtitle}>A quick confidence boost before your day gets busy.</Text></View><Pill label="FAST" tone="amber" /></View><PrimaryButton label="Start a fast drill" icon="bolt" onPress={() => start("night")} /></Card>
+        <Card style={styles.focusCard}><View style={styles.cardHeader}><Text style={styles.cardTitle}>{t("focusAreas")}</Text><MaterialIcons name="insights" color={colors.primary} size={20} /></View>{weakTopics.map((item) => <View style={styles.focusRow} key={item.topic}><View style={styles.focusMain}><Text style={styles.focusTopic}>{item.topic}</Text><View style={styles.focusBar}><ProgressBar value={item.score} color={colors.danger} /></View></View><Text style={styles.focusScore}>{item.score}%</Text></View>)}<View style={styles.focusAction}><PrimaryButton label="Practice focus areas" onPress={() => router.push("/(tabs)/study" as never)} /></View></Card>
+        {!usage.isPro ? <View style={styles.banner}><MaterialIcons name="ad-units" size={17} color="#9CA3AF" /><Text style={styles.bannerText}>AdMob banner · Home bottom · {total} Qs loaded</Text></View> : null}
       </ScrollView>
     </ScreenContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: { backgroundColor: colors.background }, content: { paddingBottom: 30 }, header: { backgroundColor: "#FFFFFF", borderBottomWidth: 1, borderBottomColor: colors.border, paddingHorizontal: 20, paddingVertical: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, greeting: { color: colors.textSecondary, fontSize: 13 }, scoreTitle: { color: colors.text, fontSize: 18, fontWeight: "800", marginTop: 2 }, headerRight: { flexDirection: "row", alignItems: "center", gap: 13 }, gaugeCard: { marginHorizontal: 16, marginTop: 16, paddingVertical: 20, alignItems: "center", backgroundColor: colors.background }, gaugeMessage: { color: "#374151", fontSize: 13, fontWeight: "700", marginTop: 8 }, gaugeHint: { color: colors.textSecondary, fontSize: 11, marginTop: 4 }, examNote: { marginTop: 15, alignSelf: "stretch", flexDirection: "row", alignItems: "center", gap: 7, backgroundColor: "#FFFBEB", borderWidth: 1, borderColor: "#FDE68A", padding: 10, borderRadius: 10 }, examText: { color: "#92400E", fontSize: 11, flex: 1, lineHeight: 16 }, dailyCard: { marginHorizontal: 16, marginTop: 13, padding: 16, borderLeftWidth: 4, borderLeftColor: colors.primary }, dailyLine: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, dailyCopy: { flex: 1, paddingRight: 10 }, cardTitle: { color: colors.text, fontSize: 15, fontWeight: "800" }, cardSubtitle: { color: colors.textSecondary, fontSize: 12, lineHeight: 17, marginTop: 4 }, roundArrow: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" }, dailyAction: { marginTop: 14 }, drillCard: { marginHorizontal: 16, marginTop: 13, padding: 16, borderColor: "#FDE68A" }, cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", gap: 10, marginBottom: 14 }, focusCard: { marginHorizontal: 16, marginTop: 13, padding: 16 }, focusRow: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 12 }, focusMain: { flex: 1 }, focusTopic: { color: colors.text, fontSize: 13, fontWeight: "700", marginBottom: 6 }, focusBar: { width: "100%" }, focusScore: { width: 32, color: colors.danger, fontSize: 12, fontWeight: "800", textAlign: "right" }, focusAction: { marginTop: 16 }, banner: { height: 50, borderWidth: 1, borderStyle: "dashed", borderColor: "#D1D5DB", borderRadius: 12, marginHorizontal: 16, marginTop: 15, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 7, backgroundColor: "#F3F4F6" }, bannerText: { color: "#9CA3AF", fontSize: 10 },
+});

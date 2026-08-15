@@ -32,7 +32,7 @@ const env = {
   appSlug: "passsafe-pro",
   // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
   // Leave empty to use the default icon from assets/images/icon.png
-  logoUrl: "",
+  logoUrl: "/manus-storage/passsafe-pro-icon_3e45384a.png",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,

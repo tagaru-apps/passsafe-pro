@@ -1,0 +1,19 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { StyleSheet, Text, View } from "react-native";
+
+import { Card, PrimaryButton, SecondaryButton, colors } from "@/components/passsafe-ui";
+import { ScreenContainer } from "@/components/screen-container";
+import { usePassSafe } from "@/lib/passsafe-context";
+import { startSession, type StudyMode } from "@/lib/session-store";
+
+export default function ResultScreen() {
+  const router = useRouter();
+  const { score: scoreParam, total: totalParam, mode } = useLocalSearchParams<{ score: string; total: string; mode: StudyMode }>();
+  const { certTrack } = usePassSafe();
+  const score = Number(scoreParam ?? 0); const total = Number(totalParam ?? 10); const percent = Math.round((score / Math.max(1, total)) * 100); const passed = percent >= 70;
+  const retry = () => { const session = startSession(mode ?? "quick", certTrack); router.replace({ pathname: "/session" as never, params: { id: session.id } } as never); };
+  return <ScreenContainer edges={["top", "bottom", "left", "right"]} style={styles.screen}><View style={styles.content}><Text style={styles.trophy}>{passed ? "🏆" : "💪"}</Text><Text style={styles.title}>{passed ? "Congratulations! You passed!" : "Keep going!"}</Text><Text style={styles.subtitle}>{passed ? "Strong work — you’re building real exam confidence." : "Every question is a step toward your certification."}</Text><Card style={styles.scoreCard}><Text style={styles.score}>{score}/{total}</Text><Text style={styles.percent}>{percent}% · {certTrack === "manager" ? "Manager" : "Food Handler"}</Text><View style={styles.stats}><View style={styles.stat}><Text style={styles.statValue}>{score}</Text><Text style={styles.statLabel}>Correct</Text></View><View style={styles.stat}><Text style={styles.statValue}>~4m</Text><Text style={styles.statLabel}>Time</Text></View><View style={styles.stat}><Text style={styles.statValue}>{total}</Text><Text style={styles.statLabel}>Questions</Text></View></View></Card><View style={styles.actions}><PrimaryButton label="Try another set" onPress={retry} /><SecondaryButton label="Back to Home" onPress={() => router.replace("/(tabs)" as never)} /></View><View style={styles.ad}><MaterialIcons name="ad-units" size={15} color="#9CA3AF" /><Text style={styles.adText}>An interstitial placement can appear after every 10 questions.</Text></View></View></ScreenContainer>;
+}
+
+const styles = StyleSheet.create({ screen: { backgroundColor: colors.background, padding: 24 }, content: { flex: 1, alignItems: "center", justifyContent: "center" }, trophy: { fontSize: 60 }, title: { color: colors.primary, fontSize: 27, fontWeight: "800", textAlign: "center", marginTop: 12 }, subtitle: { color: colors.textSecondary, fontSize: 14, textAlign: "center", lineHeight: 20, marginTop: 8, paddingHorizontal: 12 }, scoreCard: { marginTop: 24, padding: 23, alignSelf: "stretch", alignItems: "center" }, score: { color: colors.primary, fontSize: 48, fontWeight: "800", lineHeight: 55 }, percent: { color: colors.textSecondary, fontSize: 14, marginTop: 3 }, stats: { flexDirection: "row", gap: 10, marginTop: 21, alignSelf: "stretch" }, stat: { flex: 1, backgroundColor: colors.background, borderRadius: 10, padding: 11, alignItems: "center" }, statValue: { color: colors.text, fontSize: 15, fontWeight: "800" }, statLabel: { color: colors.textSecondary, fontSize: 10, marginTop: 4 }, actions: { alignSelf: "stretch", marginTop: 24, gap: 12 }, ad: { marginTop: 18, flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 15 }, adText: { color: "#9CA3AF", fontSize: 10, flex: 1, textAlign: "center", lineHeight: 14 }, });
