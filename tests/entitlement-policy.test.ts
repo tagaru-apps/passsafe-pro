@@ -21,7 +21,7 @@ describe("rewarded question entitlement policy", () => {
   });
 
   it("reports dashboard-ready used, remaining, and percentage values for free and rewarded access", () => {
-    expect(getFreeQuestionProgress({ answeredToday: 12, rewardedUnlocks: 1, isPro: false })).toEqual({ allowance: 60, used: 12, remaining: 48, percentage: 20 });
+    expect(getFreeQuestionProgress({ answeredToday: 12, rewardedUnlocks: 1, isPro: false })).toEqual({ allowance: 60, used: 12, remaining: 48, percentage: 20, remainingPercentage: 80 });
     expect(getFreeQuestionProgress({ answeredToday: 500, rewardedUnlocks: 0, isPro: true })).toBeNull();
   });
 });

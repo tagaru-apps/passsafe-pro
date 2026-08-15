@@ -26,3 +26,5 @@
 - [x] Add a prominent Home reward-ad action that instantly unlocks 10 questions after completion.
 - [x] Show Home rewarded-ad availability before tap and route unavailable rewards to Pro upgrade.
 - [x] Add a success toast and brief confetti animation after a rewarded 10-question unlock.
+- [x] Add a 30-second cooldown after a rewarded-ad load failure and open Pro on fallback tap.
+- [x] Animate the Home allowance progress bar when a completed reward grants 10 extra questions.

@@ -25,5 +25,6 @@ export function getFreeQuestionProgress(usage: EntitlementUsage) {
     used,
     remaining: Math.max(0, allowance - used),
     percentage: allowance === 0 ? 0 : Math.round((used / allowance) * 100),
+    remainingPercentage: allowance === 0 ? 0 : Math.round((Math.max(0, allowance - used) / allowance) * 100),
   };
 }
