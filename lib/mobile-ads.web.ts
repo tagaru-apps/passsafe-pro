@@ -5,3 +5,8 @@ export async function initializeMobileAds() {
 export async function showSessionInterstitial() {
   return false;
 }
+
+export async function showRewardedQuestionUnlock() {
+  await new Promise((resolve) => setTimeout(resolve, 1200));
+  return true;
+}

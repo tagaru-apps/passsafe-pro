@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 
-import { initializeMobileAds as initializeWebAds, showSessionInterstitial as showWebInterstitial } from "@/lib/mobile-ads.web";
+import { initializeMobileAds as initializeWebAds, showRewardedQuestionUnlock as showWebRewarded, showSessionInterstitial as showWebInterstitial } from "@/lib/mobile-ads.web";
 
 type NativeAdsModule = typeof import("@/lib/mobile-ads.native");
 
@@ -18,4 +18,9 @@ export async function initializeMobileAds() {
 export async function showSessionInterstitial() {
   const nativeAds = getNativeAds();
   return nativeAds ? nativeAds.showSessionInterstitial() : showWebInterstitial();
+}
+
+export async function showRewardedQuestionUnlock() {
+  const nativeAds = getNativeAds();
+  return nativeAds ? nativeAds.showRewardedQuestionUnlock() : showWebRewarded();
 }

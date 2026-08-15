@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 
 import { type AppLanguage, type CertTrack, uiCopy } from "@/lib/passsafe-data";
+import { canAnswerQuestion } from "@/lib/entitlement-policy";
 
 type TopicProgress = Record<string, { total: number; correct: number }>;
 type Usage = { date: string; answeredToday: number; rewardedUnlocks: number; isPro: boolean; proSince: string | null };
@@ -99,7 +100,7 @@ export function PassSafeProvider({ children }: PropsWithChildren) {
       setProgress(next);
       await AsyncStorage.setItem(keys.progress, JSON.stringify(next));
     },
-    canAnswer: () => usage.isPro || usage.answeredToday < 50 + usage.rewardedUnlocks * 10,
+    canAnswer: () => canAnswerQuestion(usage),
     incrementUsage: async () => persistUsage({ ...usage, answeredToday: usage.answeredToday + 1 }),
     unlockRewarded: async () => persistUsage({ ...usage, rewardedUnlocks: usage.rewardedUnlocks + 1 }),
     setPro: async (value) => persistUsage({ ...usage, isPro: value, proSince: value ? new Date().toISOString() : null }),
