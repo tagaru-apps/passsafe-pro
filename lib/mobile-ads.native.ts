@@ -58,3 +58,18 @@ export async function showRewardedQuestionUnlock() {
     rewarded.load();
   });
 }
+
+export async function checkRewardedAdAvailability(): Promise<"ready" | "unavailable"> {
+  const rewarded = RewardedAd.createForAdRequest(resolveAdUnit("rewarded", __DEV__), {
+    requestNonPersonalizedAdsOnly: true,
+  });
+  return new Promise((resolve) => {
+    const cleanUp = () => {
+      loadUnsubscribe();
+      errorUnsubscribe();
+    };
+    const loadUnsubscribe = rewarded.addAdEventListener(AdEventType.LOADED, () => { cleanUp(); resolve("ready"); });
+    const errorUnsubscribe = rewarded.addAdEventListener(AdEventType.ERROR, () => { cleanUp(); resolve("unavailable"); });
+    rewarded.load();
+  });
+}

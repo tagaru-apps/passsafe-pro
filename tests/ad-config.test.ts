@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { admobTestUnits, resolveAdUnit } from "@/lib/ad-config";
+import { checkRewardedAdAvailability } from "@/lib/mobile-ads.web";
 
 describe("AdMob configuration", () => {
   it("uses Google test units during development", () => {
@@ -13,5 +14,9 @@ describe("AdMob configuration", () => {
     expect(admobTestUnits.banner).toMatch(/^ca-app-pub-\d+\/\d+$/);
     expect(admobTestUnits.interstitial).toMatch(/^ca-app-pub-\d+\/\d+$/);
     expect(admobTestUnits.rewarded).toMatch(/^ca-app-pub-\d+\/\d+$/);
+  });
+
+  it("reports a development-safe rewarded placement as available on web", async () => {
+    await expect(checkRewardedAdAvailability()).resolves.toBe("ready");
   });
 });
