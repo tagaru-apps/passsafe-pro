@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { canAnswerQuestion, FREE_QUESTION_LIMIT, getQuestionAllowance, REWARDED_QUESTION_UNLOCK } from "@/lib/entitlement-policy";
+import { canAnswerQuestion, FREE_QUESTION_LIMIT, getFreeQuestionProgress, getQuestionAllowance, REWARDED_QUESTION_UNLOCK } from "@/lib/entitlement-policy";
 
 describe("rewarded question entitlement policy", () => {
   it("starts free learners with the intended daily allowance", () => {
@@ -18,5 +18,10 @@ describe("rewarded question entitlement policy", () => {
 
   it("leaves Pro learners unlimited", () => {
     expect(canAnswerQuestion({ answeredToday: 5000, rewardedUnlocks: 0, isPro: true })).toBe(true);
+  });
+
+  it("reports dashboard-ready used, remaining, and percentage values for free and rewarded access", () => {
+    expect(getFreeQuestionProgress({ answeredToday: 12, rewardedUnlocks: 1, isPro: false })).toEqual({ allowance: 60, used: 12, remaining: 48, percentage: 20 });
+    expect(getFreeQuestionProgress({ answeredToday: 500, rewardedUnlocks: 0, isPro: true })).toBeNull();
   });
 });

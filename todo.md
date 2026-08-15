@@ -22,3 +22,4 @@
 - [x] Add a subscription settings screen with current status and purchase restoration.
 - [x] Add a Free-versus-Pro benefit comparison to the subscription paywall.
 - [x] Show a success animation and thank-you modal after confirmed Pro activation.
+- [x] Add a Home dashboard progress bar for remaining daily free questions and rewarded unlocks.

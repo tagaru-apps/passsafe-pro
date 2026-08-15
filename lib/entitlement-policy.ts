@@ -15,3 +15,15 @@ export function getQuestionAllowance(usage: EntitlementUsage): number {
 export function canAnswerQuestion(usage: EntitlementUsage): boolean {
   return usage.answeredToday < getQuestionAllowance(usage);
 }
+
+export function getFreeQuestionProgress(usage: EntitlementUsage) {
+  const allowance = getQuestionAllowance(usage);
+  if (!Number.isFinite(allowance)) return null;
+  const used = Math.min(usage.answeredToday, allowance);
+  return {
+    allowance,
+    used,
+    remaining: Math.max(0, allowance - used),
+    percentage: allowance === 0 ? 0 : Math.round((used / allowance) * 100),
+  };
+}
