@@ -1,0 +1,27 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useRouter } from "expo-router";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+
+import { PrimaryButton, SecondaryButton, colors } from "@/components/passsafe-ui";
+import { ScreenContainer } from "@/components/screen-container";
+import { useEntitlement } from "@/hooks/use-entitlement";
+
+export default function SubscriptionScreen() {
+  const router = useRouter();
+  const entitlement = useEntitlement();
+
+  const restore = async () => { await entitlement.restore(); };
+
+  return <ScreenContainer edges={["top", "bottom", "left", "right"]} style={styles.screen}><ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <View style={styles.header}><Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.back()} style={({ pressed }) => [styles.back, pressed && styles.pressed]}><MaterialIcons name="arrow-back" size={21} color={colors.text} /></Pressable><Text style={styles.headerTitle}>Subscription</Text><View style={styles.headerSpace} /></View>
+    <View style={[styles.status, entitlement.isPro ? styles.statusPro : styles.statusFree]}><View style={[styles.statusIcon, entitlement.isPro ? styles.statusIconPro : styles.statusIconFree]}><MaterialIcons name={entitlement.isPro ? "verified" : "lock-outline"} size={28} color={entitlement.isPro ? "#FFFFFF" : "#B45309"} /></View><Text style={styles.statusTitle}>{entitlement.isPro ? "PassSafe Pro is active" : "You’re using PassSafe Free"}</Text><Text style={styles.statusCopy}>{entitlement.isPro ? "Unlimited practice and ad-free study are enabled on this device." : "Upgrade whenever you’re ready for unlimited, ad-free study."}</Text></View>
+    <View style={styles.section}><Text style={styles.sectionTitle}>Your purchase</Text><View style={styles.detailRow}><Text style={styles.detailLabel}>Subscription status</Text><Text style={[styles.detailValue, entitlement.isPro && styles.detailValuePro]}>{entitlement.isPro ? "Active" : "Free plan"}</Text></View><View style={styles.line} /><View style={styles.detailRow}><Text style={styles.detailLabel}>Store connection</Text><Text style={styles.detailValue}>{entitlement.isConfigured ? "Ready" : "Available in native build"}</Text></View></View>
+    {entitlement.error ? <View style={styles.notice}><MaterialIcons name="info-outline" size={18} color="#92400E" /><Text style={styles.noticeText}>{entitlement.error}</Text></View> : null}
+    {entitlement.isLoading ? <View style={styles.loading}><ActivityIndicator color={colors.primary} /><Text style={styles.loadingText}>Checking subscription status…</Text></View> : <View style={styles.actions}>{!entitlement.isPro ? <PrimaryButton label="View Pro plans" onPress={() => router.push("/pro" as never)} /> : <PrimaryButton label="View plan options" onPress={() => router.push("/pro" as never)} />}<SecondaryButton label={entitlement.isWorking ? "Restoring purchases…" : "Restore previous purchases"} onPress={restore} /></View>}
+    <Text style={styles.helper}>Restoring checks your App Store or Google Play account for a previous PassSafe Pro purchase. It does not create a new charge.</Text>
+  </ScrollView></ScreenContainer>;
+}
+
+const styles = StyleSheet.create({
+  screen: { backgroundColor: colors.background }, content: { padding: 20, paddingBottom: 32 }, header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, back: { width: 40, height: 40, borderRadius: 20, backgroundColor: "#FFFFFF", borderWidth: 1, borderColor: colors.border, alignItems: "center", justifyContent: "center" }, headerTitle: { color: colors.text, fontSize: 18, fontWeight: "800" }, headerSpace: { width: 40 }, status: { borderRadius: 20, alignItems: "center", padding: 24, marginTop: 22 }, statusPro: { backgroundColor: colors.primary }, statusFree: { backgroundColor: "#FFFBEB", borderWidth: 1, borderColor: "#FDE68A" }, statusIcon: { width: 58, height: 58, borderRadius: 29, alignItems: "center", justifyContent: "center" }, statusIconPro: { backgroundColor: "rgba(255,255,255,0.18)" }, statusIconFree: { backgroundColor: "#FFFFFF" }, statusTitle: { fontSize: 20, fontWeight: "800", textAlign: "center", marginTop: 13, color: "#FFFFFF" }, statusCopy: { fontSize: 13, lineHeight: 19, textAlign: "center", marginTop: 7, maxWidth: 290, color: "#D1FAE5" }, section: { backgroundColor: "#FFFFFF", borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 16, marginTop: 18 }, sectionTitle: { color: colors.text, fontSize: 15, fontWeight: "800", marginBottom: 8 }, detailRow: { minHeight: 42, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }, detailLabel: { color: colors.textSecondary, fontSize: 13 }, detailValue: { color: colors.text, fontSize: 13, fontWeight: "700", textAlign: "right" }, detailValuePro: { color: colors.primary }, line: { height: 1, backgroundColor: colors.border }, notice: { marginTop: 16, backgroundColor: "#FFFBEB", borderRadius: 12, borderWidth: 1, borderColor: "#FDE68A", padding: 12, flexDirection: "row", gap: 9 }, noticeText: { color: "#92400E", fontSize: 12, lineHeight: 17, flex: 1 }, loading: { paddingVertical: 25, alignItems: "center", gap: 10 }, loadingText: { color: colors.textSecondary, fontSize: 13 }, actions: { gap: 10, marginTop: 20 }, helper: { color: "#9CA3AF", fontSize: 11, lineHeight: 16, textAlign: "center", marginTop: 16, paddingHorizontal: 13 }, pressed: { opacity: 0.88, transform: [{ scale: 0.98 }] },
+});

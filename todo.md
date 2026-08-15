@@ -19,3 +19,6 @@
 - [x] Add native Google Mobile Ads banner and interstitial placements with web-safe fallbacks.
 - [x] Connect rewarded AdMob completion to the 10-question free-limit unlock policy.
 - [x] Create a RevenueCat-backed Pro subscription paywall with purchase and restore actions.
+- [x] Add a subscription settings screen with current status and purchase restoration.
+- [x] Add a Free-versus-Pro benefit comparison to the subscription paywall.
+- [x] Show a success animation and thank-you modal after confirmed Pro activation.
