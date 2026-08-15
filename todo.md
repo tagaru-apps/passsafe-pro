@@ -14,3 +14,6 @@
 - [x] Move top screen content below iPhone camera cutouts and Dynamic Island safe areas.
 - [x] Add a dense but touch-safe compact mode for iPhone SE-class screens.
 - [x] Validate Android responsive scaling, camera-cutout safety, and bottom navigation clearance.
+- [ ] Add native AdMob, App Tracking Transparency, and RevenueCat monetization integration for Play Store and App Store builds.
+- [ ] Implement the supplied daily free-limit and rewarded-unlock entitlement policy as a dedicated hook.
+- [x] Add native Google Mobile Ads banner and interstitial placements with web-safe fallbacks.

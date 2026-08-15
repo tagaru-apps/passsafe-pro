@@ -1,5 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Card, PrimaryButton, SecondaryButton, colors } from "@/components/passsafe-ui";
@@ -7,13 +8,17 @@ import { ScreenContainer } from "@/components/screen-container";
 import { usePassSafe } from "@/lib/passsafe-context";
 import { startSession, type StudyMode } from "@/lib/session-store";
 import { useCompactScreen } from "@/hooks/use-compact-screen";
+import { showSessionInterstitial } from "@/lib/mobile-ads";
 
 export default function ResultScreen() {
   const router = useRouter();
   const { isCompact } = useCompactScreen();
   const { score: scoreParam, total: totalParam, mode } = useLocalSearchParams<{ score: string; total: string; mode: StudyMode }>();
-  const { certTrack } = usePassSafe();
+  const { certTrack, usage } = usePassSafe();
   const score = Number(scoreParam ?? 0); const total = Number(totalParam ?? 10); const percent = Math.round((score / Math.max(1, total)) * 100); const passed = percent >= 70;
+  useEffect(() => {
+    if (!usage.isPro && total > 0 && total % 10 === 0) showSessionInterstitial().catch(() => undefined);
+  }, [total, usage.isPro]);
   const retry = () => { const session = startSession(mode ?? "quick", certTrack); router.replace({ pathname: "/session" as never, params: { id: session.id } } as never); };
   return <ScreenContainer edges={["top", "bottom", "left", "right"]} style={styles.screen}><View style={[styles.content, isCompact && styles.contentCompact]}><Text style={[styles.trophy, isCompact && styles.trophyCompact]}>{passed ? "🏆" : "💪"}</Text><Text style={[styles.title, isCompact && styles.titleCompact]}>{passed ? "Congratulations! You passed!" : "Keep going!"}</Text><Text style={styles.subtitle}>{passed ? "Strong work — you’re building real exam confidence." : "Every question is a step toward your certification."}</Text><Card style={[styles.scoreCard, isCompact && styles.scoreCardCompact]}><Text style={[styles.score, isCompact && styles.scoreCompact]}>{score}/{total}</Text><Text style={styles.percent}>{percent}% · {certTrack === "manager" ? "Manager" : "Food Handler"}</Text><View style={styles.stats}><View style={styles.stat}><Text style={styles.statValue}>{score}</Text><Text style={styles.statLabel}>Correct</Text></View><View style={styles.stat}><Text style={styles.statValue}>~4m</Text><Text style={styles.statLabel}>Time</Text></View><View style={styles.stat}><Text style={styles.statValue}>{total}</Text><Text style={styles.statLabel}>Questions</Text></View></View></Card><View style={[styles.actions, isCompact && styles.actionsCompact]}><PrimaryButton label="Try another set" onPress={retry} /><SecondaryButton label="Back to Home" onPress={() => router.replace("/(tabs)" as never)} /></View><View style={styles.ad}><MaterialIcons name="ad-units" size={15} color="#9CA3AF" /><Text style={styles.adText}>An interstitial placement can appear after every 10 questions.</Text></View></View></ScreenContainer>;
 }

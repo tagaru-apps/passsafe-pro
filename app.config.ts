@@ -64,7 +64,7 @@ const config: ExpoConfig = {
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
     package: env.androidPackage,
-    permissions: ["POST_NOTIFICATIONS"],
+    permissions: ["POST_NOTIFICATIONS", "com.google.android.gms.permission.AD_ID"],
     intentFilters: [
       {
         action: "VIEW",
@@ -86,6 +86,20 @@ const config: ExpoConfig = {
   },
   plugins: [
     "expo-router",
+    [
+      "react-native-google-mobile-ads",
+      {
+        androidAppId: "ca-app-pub-3940256099942544~3347511713",
+        iosAppId: "ca-app-pub-3940256099942544~1458002511",
+        userTrackingUsageDescription: "This identifier will be used to deliver personalized ads to you.",
+      },
+    ],
+    [
+      "expo-tracking-transparency",
+      {
+        userTrackingPermission: "We use your data to provide personalized ads",
+      },
+    ],
     [
       "expo-audio",
       {

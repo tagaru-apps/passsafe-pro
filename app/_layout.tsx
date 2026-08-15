@@ -1,10 +1,16 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { PassSafeProvider } from "@/lib/passsafe-context";
+import { initializeMobileAds } from "@/lib/mobile-ads";
 
 export default function RootLayout() {
+  useEffect(() => {
+    initializeMobileAds().catch(() => undefined);
+  }, []);
+
   return (
     <SafeAreaProvider>
       <PassSafeProvider>
