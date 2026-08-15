@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } fro
 import Svg, { Path } from "react-native-svg";
 
 import { haptic } from "@/lib/haptics";
+import { useCompactScreen } from "@/hooks/use-compact-screen";
 
 export const colors = {
   primary: "#1B5E40",
@@ -24,8 +25,9 @@ export function Card({ children, style }: { children: ReactNode; style?: StylePr
 }
 
 export function PrimaryButton({ label, onPress, disabled = false, icon }: { label: string; onPress: () => void; disabled?: boolean; icon?: keyof typeof MaterialIcons.glyphMap }) {
+  const { isCompact } = useCompactScreen();
   return (
-    <Pressable accessibilityRole="button" disabled={disabled} onPress={() => { haptic.light(); onPress(); }} style={({ pressed }) => [styles.primaryButton, disabled && styles.disabled, pressed && styles.pressed]}>
+    <Pressable accessibilityRole="button" disabled={disabled} onPress={() => { haptic.light(); onPress(); }} style={({ pressed }) => [styles.primaryButton, isCompact && styles.compactButton, disabled && styles.disabled, pressed && styles.pressed]}>
       {icon ? <MaterialIcons name={icon} size={20} color="#FFFFFF" /> : null}
       <Text style={styles.primaryButtonText}>{label}</Text>
     </Pressable>
@@ -33,8 +35,9 @@ export function PrimaryButton({ label, onPress, disabled = false, icon }: { labe
 }
 
 export function SecondaryButton({ label, onPress }: { label: string; onPress: () => void }) {
+  const { isCompact } = useCompactScreen();
   return (
-    <Pressable accessibilityRole="button" onPress={() => { haptic.light(); onPress(); }} style={({ pressed }) => [styles.secondaryButton, pressed && styles.pressed]}>
+    <Pressable accessibilityRole="button" onPress={() => { haptic.light(); onPress(); }} style={({ pressed }) => [styles.secondaryButton, isCompact && styles.compactButton, pressed && styles.pressed]}>
       <Text style={styles.secondaryButtonText}>{label}</Text>
     </Pressable>
   );
@@ -47,18 +50,20 @@ export function Pill({ label, tone = "green" }: { label: string; tone?: "green" 
 }
 
 export function ReadinessGauge({ value, size = 190 }: { value: number; size?: number }) {
+  const { isCompact } = useCompactScreen();
+  const displaySize = isCompact ? Math.min(size, 166) : size;
   const stroke = 12;
-  const radius = (size - stroke) / 2;
+  const radius = (displaySize - stroke) / 2;
   const circumference = Math.PI * radius;
   const clamped = Math.min(100, Math.max(0, value));
   return (
-    <View style={[styles.gaugeWrap, { width: size, height: size / 2 + 26 }]}>
-      <Svg width={size} height={size / 2 + stroke} viewBox={`0 0 ${size} ${size / 2 + stroke}`}>
-        <Path d={`M ${stroke / 2} ${size / 2} A ${radius} ${radius} 0 0 1 ${size - stroke / 2} ${size / 2}`} fill="none" stroke={colors.border} strokeWidth={stroke} strokeLinecap="round" />
-        <Path d={`M ${stroke / 2} ${size / 2} A ${radius} ${radius} 0 0 1 ${size - stroke / 2} ${size / 2}`} fill="none" stroke={colors.primary} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${(circumference * clamped) / 100} ${circumference}`} />
+    <View style={[styles.gaugeWrap, { width: displaySize, height: displaySize / 2 + 26 }]}>
+      <Svg width={displaySize} height={displaySize / 2 + stroke} viewBox={`0 0 ${displaySize} ${displaySize / 2 + stroke}`}>
+        <Path d={`M ${stroke / 2} ${displaySize / 2} A ${radius} ${radius} 0 0 1 ${displaySize - stroke / 2} ${displaySize / 2}`} fill="none" stroke={colors.border} strokeWidth={stroke} strokeLinecap="round" />
+        <Path d={`M ${stroke / 2} ${displaySize / 2} A ${radius} ${radius} 0 0 1 ${displaySize - stroke / 2} ${displaySize / 2}`} fill="none" stroke={colors.primary} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${(circumference * clamped) / 100} ${circumference}`} />
       </Svg>
       <View style={styles.gaugeTextWrap}>
-        <Text style={styles.gaugeValue}>{clamped}%</Text>
+        <Text style={[styles.gaugeValue, isCompact && styles.compactGaugeValue]}>{clamped}%</Text>
         <Text style={styles.gaugeLabel}>READINESS</Text>
       </View>
     </View>
@@ -75,6 +80,7 @@ export const styles = StyleSheet.create({
   primaryButtonText: { color: "#FFFFFF", fontSize: 16, fontWeight: "700" },
   secondaryButton: { minHeight: 56, borderRadius: 28, backgroundColor: "#FFFBEB", borderWidth: 2, borderColor: colors.accent, alignItems: "center", justifyContent: "center", paddingHorizontal: 20 },
   secondaryButtonText: { color: "#B45309", fontSize: 16, fontWeight: "700" },
+  compactButton: { minHeight: 48, borderRadius: 24 },
   pressed: { opacity: 0.9, transform: [{ scale: 0.97 }] },
   disabled: { opacity: 0.55 },
   pill: { alignSelf: "flex-start", borderRadius: 99, paddingHorizontal: 8, paddingVertical: 4 },
@@ -90,6 +96,7 @@ export const styles = StyleSheet.create({
   gaugeWrap: { alignItems: "center", justifyContent: "flex-start" },
   gaugeTextWrap: { position: "absolute", bottom: 0, alignItems: "center" },
   gaugeValue: { color: colors.primary, fontSize: 33, fontWeight: "800", lineHeight: 38 },
+  compactGaugeValue: { fontSize: 28, lineHeight: 33 },
   gaugeLabel: { color: colors.textSecondary, fontSize: 10, fontWeight: "700", letterSpacing: 1.1, marginTop: 1 },
   progressTrack: { height: 7, backgroundColor: colors.border, borderRadius: 99, overflow: "hidden" },
   progressFill: { height: "100%", borderRadius: 99 },

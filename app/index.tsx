@@ -1,17 +1,17 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { Card, PrimaryButton, colors } from "@/components/passsafe-ui";
 import { ScreenContainer } from "@/components/screen-container";
 import { usePassSafe } from "@/lib/passsafe-context";
+import { useCompactScreen } from "@/hooks/use-compact-screen";
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const { hydrated, hasCompletedOnboarding } = usePassSafe();
-  const { height } = useWindowDimensions();
-  const compactHeight = height < 680;
+  const { isCompact } = useCompactScreen();
 
   useEffect(() => {
     if (hydrated && hasCompletedOnboarding) router.replace("/(tabs)");
@@ -23,15 +23,15 @@ export default function WelcomeScreen() {
 
   return (
     <ScreenContainer edges={["top", "bottom", "left", "right"]} className="px-6" style={styles.screen}>
-      <ScrollView contentContainerStyle={[styles.scrollContent, compactHeight && styles.scrollContentCompact]} showsVerticalScrollIndicator={false} bounces={false}>
-        <View style={[styles.content, compactHeight && styles.contentCompact]}>
-          <View style={[styles.hero, compactHeight && styles.heroCompact]}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, isCompact && styles.scrollContentCompact]} showsVerticalScrollIndicator={false} bounces={false}>
+        <View style={[styles.content, isCompact && styles.contentCompact]}>
+          <View style={[styles.hero, isCompact && styles.heroCompact]}>
           <View style={styles.logo}><MaterialIcons name="security" size={36} color="#FFFFFF" /><Text style={styles.logoFork}>♜</Text><View style={styles.logoDot} /></View>
           <Text style={styles.brand}>PassSafe</Text>
           <Text style={styles.title}>Food safety confidence, built one question at a time.</Text>
           <Text style={styles.subtitle}>Study smarter. Pass first try.</Text>
         </View>
-        <Card style={[styles.promiseCard, compactHeight && styles.promiseCardCompact]}>
+        <Card style={[styles.promiseCard, isCompact && styles.promiseCardCompact]}>
           <View style={styles.promiseIcon}><MaterialIcons name="verified-user" size={24} color={colors.primary} /></View>
           <View style={styles.promiseCopy}><Text style={styles.promiseTitle}>Pass with practical mastery</Text><Text style={styles.promiseText}>Multilingual practice, FDA-based explanations, and a focused plan for your exam day.</Text></View>
         </Card>
