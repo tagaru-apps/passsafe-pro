@@ -1,7 +1,10 @@
 import { View, type ViewProps } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { SafeAreaView, type Edge } from "react-native-safe-area-context";
 
 import { cn } from "@/lib/utils";
+
+export const APP_CONTENT_MAX_WIDTH = 520;
 
 export interface ScreenContainerProps extends ViewProps {
   /**
@@ -48,21 +51,35 @@ export function ScreenContainer({
   ...props
 }: ScreenContainerProps) {
   return (
-    <View
-      className={cn(
-        "flex-1",
-        "bg-background",
-        containerClassName
-      )}
-      {...props}
-    >
+    <View className={cn("flex-1", "bg-background", containerClassName)} style={styles.outer} {...props}>
       <SafeAreaView
         edges={edges}
         className={cn("flex-1", safeAreaClassName)}
-        style={style}
+        style={[styles.frame, style]}
       >
         <View className={cn("flex-1", className)}>{children}</View>
       </SafeAreaView>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  outer: {
+    alignItems: "center",
+    backgroundColor: Platform.OS === "web" ? "#E5E7EB" : "#FAFAF8",
+  },
+  frame: {
+    width: "100%",
+    maxWidth: APP_CONTENT_MAX_WIDTH,
+    alignSelf: "center",
+    backgroundColor: "#FAFAF8",
+    ...(Platform.OS === "web"
+      ? {
+          shadowColor: "#111827",
+          shadowOpacity: 0.14,
+          shadowRadius: 28,
+          shadowOffset: { width: 0, height: 8 },
+        }
+      : {}),
+  },
+});

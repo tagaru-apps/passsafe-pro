@@ -4,6 +4,7 @@ import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors } from "@/components/passsafe-ui";
+import { APP_CONTENT_MAX_WIDTH } from "@/components/screen-container";
 import { usePassSafe } from "@/lib/passsafe-context";
 
 const iconByRoute = { index: "home", study: "menu-book", progress: "assessment", profile: "person" } as const;
@@ -17,7 +18,7 @@ export default function TabLayout() {
       headerShown: false,
       tabBarActiveTintColor: colors.primary,
       tabBarInactiveTintColor: "#9CA3AF",
-      tabBarStyle: { backgroundColor: "#FFFFFF", borderTopColor: colors.border, height: 56 + bottomPadding, paddingTop: 7, paddingBottom: bottomPadding },
+      tabBarStyle: { backgroundColor: "#FFFFFF", borderTopColor: colors.border, height: 56 + bottomPadding, paddingTop: 7, paddingBottom: bottomPadding, width: "100%", maxWidth: APP_CONTENT_MAX_WIDTH, alignSelf: "center" },
       tabBarLabelStyle: { fontSize: 10, fontWeight: "700" },
       tabBarIcon: ({ color, size }) => <MaterialIcons name={iconByRoute[route.name as keyof typeof iconByRoute]} color={color} size={size} />,
     })}>
