@@ -13,3 +13,4 @@
 - [x] Refine every React Native screen for compact, standard, and large portrait emulator layouts.
 - [x] Move top screen content below iPhone camera cutouts and Dynamic Island safe areas.
 - [x] Add a dense but touch-safe compact mode for iPhone SE-class screens.
+- [x] Validate Android responsive scaling, camera-cutout safety, and bottom navigation clearance.

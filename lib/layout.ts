@@ -13,3 +13,8 @@ export function isCompactDevice(width: number, height: number): boolean {
 export function getTopContentInset(systemTopInset: number): number {
   return Math.max(systemTopInset, 18);
 }
+
+export function getBottomTabMetrics(systemBottomInset: number, isWeb: boolean) {
+  const bottomPadding = isWeb ? 10 : Math.max(systemBottomInset, 8);
+  return { bottomPadding, height: 56 + bottomPadding };
+}
