@@ -6,6 +6,7 @@ import { ActivityIndicator, Animated, Modal, Pressable, ScrollView, StyleSheet, 
 import { AdBanner } from "@/components/ads/ad-banner";
 import { Card, Pill, PrimaryButton, ProgressBar, ReadinessGauge, colors } from "@/components/passsafe-ui";
 import { ScreenContainer } from "@/components/screen-container";
+import { WeeklyRewardTrend } from "@/components/weekly-reward-trend";
 import { useCompactScreen } from "@/hooks/use-compact-screen";
 import { scheduleCooldownCompleteNotification } from "@/lib/cooldown-notifications";
 import { getFreeQuestionProgress } from "@/lib/entitlement-policy";
@@ -13,7 +14,7 @@ import { haptic } from "@/lib/haptics";
 import { checkRewardedAdAvailability, showRewardedQuestionUnlock } from "@/lib/mobile-ads";
 import { filteredQuestions, getQuestionTopics } from "@/lib/passsafe-data";
 import { usePassSafe } from "@/lib/passsafe-context";
-import { getWeeklyRewardSummary } from "@/lib/reward-summary";
+import { getWeeklyRewardSummary, getWeeklyRewardTrend } from "@/lib/reward-summary";
 import { startSession } from "@/lib/session-store";
 
 export default function HomeScreen() {
@@ -39,6 +40,7 @@ export default function HomeScreen() {
   const questionProgress = getFreeQuestionProgress(usage);
   const remainingPercentage = questionProgress?.remainingPercentage ?? 0;
   const weeklyRewards = getWeeklyRewardSummary(usage.rewardEvents);
+  const weeklyTrend = getWeeklyRewardTrend(usage.rewardEvents);
   const weakTopics = getQuestionTopics(certTrack).map(({ topic }) => ({ topic, score: progress[topic] ? Math.round((progress[topic].correct / progress[topic].total) * 100) : 0 })).sort((a, b) => a.score - b.score).slice(0, 2);
 
   const start = (mode: "quick" | "night") => {
@@ -122,7 +124,7 @@ export default function HomeScreen() {
       <View style={[styles.banner, isCompact && styles.bannerCompact]}><AdBanner visible={!usage.isPro} /></View>
     </ScrollView>
     {showRewardToast ? <View pointerEvents="none" style={styles.celebrationLayer}><Animated.View style={[styles.rewardToast, { opacity: toastOpacity, transform: [{ translateY: toastY }] }]}><MaterialIcons name="check-circle" size={20} color="#FFFFFF" /><Text style={styles.rewardToastText}>+10 questions unlocked</Text></Animated.View><Animated.Text style={[styles.confetti, styles.confettiOne, { transform: [{ translateY: confettiProgress.interpolate({ inputRange: [0, 1], outputRange: [0, -116] }) }] }]}>✦</Animated.Text><Animated.Text style={[styles.confetti, styles.confettiTwo, { transform: [{ translateY: confettiProgress.interpolate({ inputRange: [0, 1], outputRange: [0, -96] }) }] }]}>●</Animated.Text><Animated.Text style={[styles.confetti, styles.confettiThree, { transform: [{ translateY: confettiProgress.interpolate({ inputRange: [0, 1], outputRange: [0, -132] }) }] }]}>✦</Animated.Text></View> : null}
-    <Modal visible={showWeeklySummary} transparent animationType="fade" onRequestClose={() => setShowWeeklySummary(false)}><View style={styles.weeklyOverlay}><View style={styles.weeklyModal}><View style={styles.weeklyIcon}><MaterialIcons name="auto-graph" size={31} color="#FFFFFF" /></View><Text style={styles.weeklyTitle}>Your weekly reward summary</Text><Text style={styles.weeklyQuestions}>{weeklyRewards.questions}</Text><Text style={styles.weeklyLabel}>extra questions unlocked this week</Text><View style={styles.weeklyStat}><Text style={styles.weeklyStatValue}>{weeklyRewards.unlocks}</Text><Text style={styles.weeklyStatLabel}>rewarded ad{weeklyRewards.unlocks === 1 ? "" : "s"} completed</Text></View><Text style={styles.weeklyCopy}>{weeklyRewards.questions > 0 ? "Nice work—those bonus questions are helping you build steady practice momentum." : "Complete a rewarded ad when available to unlock 10 extra practice questions."}</Text><Pressable accessibilityRole="button" onPress={() => setShowWeeklySummary(false)} style={({ pressed }) => [styles.weeklyClose, pressed && styles.pressed]}><Text style={styles.weeklyCloseText}>Done</Text></Pressable></View></View></Modal>
+    <Modal visible={showWeeklySummary} transparent animationType="fade" onRequestClose={() => setShowWeeklySummary(false)}><View style={styles.weeklyOverlay}><View style={styles.weeklyModal}><View style={styles.weeklyIcon}><MaterialIcons name="auto-graph" size={31} color="#FFFFFF" /></View><Text style={styles.weeklyTitle}>Your weekly reward summary</Text><Text style={styles.weeklyQuestions}>{weeklyRewards.questions}</Text><Text style={styles.weeklyLabel}>extra questions unlocked this week</Text><View style={styles.weeklyStat}><Text style={styles.weeklyStatValue}>{weeklyRewards.unlocks}</Text><Text style={styles.weeklyStatLabel}>rewarded ad{weeklyRewards.unlocks === 1 ? "" : "s"} completed</Text></View><WeeklyRewardTrend data={weeklyTrend} /><Text style={styles.weeklyCopy}>{weeklyRewards.questions > 0 ? "Nice work—those bonus questions are helping you build steady practice momentum." : "Complete a rewarded ad when available to unlock 10 extra practice questions."}</Text><Pressable accessibilityRole="button" onPress={() => setShowWeeklySummary(false)} style={({ pressed }) => [styles.weeklyClose, pressed && styles.pressed]}><Text style={styles.weeklyCloseText}>Done</Text></Pressable></View></View></Modal>
   </ScreenContainer>;
 }
 

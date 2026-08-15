@@ -20,8 +20,18 @@ export async function scheduleCooldownCompleteNotification() {
   if (status !== "granted") return false;
   if (scheduledCooldownNotification) await Notifications.cancelScheduledNotificationAsync(scheduledCooldownNotification).catch(() => undefined);
   scheduledCooldownNotification = await Notifications.scheduleNotificationAsync({
-    content: { title: "Your reward is ready", body: "A new rewarded ad may be available. Unlock 10 more PassSafe questions.", data: { url: "/(tabs)" } },
+    content: { title: "Your reward is ready", body: "A new rewarded ad may be available. Unlock 10 more PassSafe questions.", data: { url: "/(tabs)?focus=reward" } },
     trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 30, repeats: false, channelId: "reward-cooldowns" },
   });
   return true;
+}
+
+export function subscribeToCooldownNotificationLinks(onRoute: (url: string) => void) {
+  const routeFrom = (notification: Notifications.Notification) => {
+    const url = notification.request.content.data?.url;
+    if (typeof url === "string" && url.startsWith("/")) onRoute(url);
+  };
+  void Notifications.getLastNotificationResponseAsync().then((response) => { if (response?.notification) routeFrom(response.notification); });
+  const subscription = Notifications.addNotificationResponseReceivedListener((response) => routeFrom(response.notification));
+  return () => subscription.remove();
 }

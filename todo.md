@@ -31,3 +31,6 @@
 - [x] Add a weekly reward-usage summary modal showing extra questions unlocked.
 - [x] Add a limited-time discount countdown to the Pro paywall.
 - [x] Send a local notification when the rewarded-ad cooldown ends.
+- [x] Deep link cooldown-complete notifications to the Home rewarded-ad section.
+- [x] Add a daily trend chart to the weekly rewarded-question summary modal.
+- [x] Connect the recovery countdown to a configured RevenueCat promotional offering.

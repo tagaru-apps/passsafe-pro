@@ -18,3 +18,8 @@ export async function scheduleCooldownCompleteNotification() {
   const native = nativeModule();
   return native ? native.scheduleCooldownCompleteNotification() : scheduleWebCooldown();
 }
+
+export function subscribeToCooldownNotificationLinks(onRoute: (url: string) => void) {
+  const native = nativeModule();
+  return native ? native.subscribeToCooldownNotificationLinks(onRoute) : () => undefined;
+}

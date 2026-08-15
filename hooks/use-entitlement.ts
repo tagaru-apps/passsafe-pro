@@ -7,6 +7,7 @@ import { usePassSafe } from "@/lib/passsafe-context";
 export function useEntitlement() {
   const { usage, setPro } = usePassSafe();
   const [packages, setPackages] = useState<ProPackage[]>([]);
+  const [promoPackages, setPromoPackages] = useState<ProPackage[]>([]);
   const [isConfigured, setIsConfigured] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isWorking, setIsWorking] = useState(false);
@@ -19,6 +20,7 @@ export function useEntitlement() {
       const snapshot = await getRevenueCatSnapshot();
       setIsConfigured(snapshot.configured);
       setPackages(snapshot.packages);
+      setPromoPackages(snapshot.promoPackages);
       await setPro(snapshot.isPro);
       if (!snapshot.configured) setError("Purchases are available in a native iOS or Android development build.");
       else if (!snapshot.isPro && snapshot.packages.length === 0) setError("No Pro packages are available yet. Finish configuring the current offering in RevenueCat.");
@@ -52,5 +54,5 @@ export function useEntitlement() {
     return result.isPro;
   }, [setPro]);
 
-  return { isPro: usage.isPro, packages, isConfigured, isLoading, isWorking, error, purchase, restore, refresh };
+  return { isPro: usage.isPro, packages, promoPackages, isConfigured, isLoading, isWorking, error, purchase, restore, refresh };
 }

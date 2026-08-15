@@ -1,17 +1,19 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { PassSafeProvider } from "@/lib/passsafe-context";
-import { initializeCooldownNotifications } from "@/lib/cooldown-notifications";
+import { initializeCooldownNotifications, subscribeToCooldownNotificationLinks } from "@/lib/cooldown-notifications";
 import { initializeMobileAds } from "@/lib/mobile-ads";
 
 export default function RootLayout() {
+  const router = useRouter();
   useEffect(() => {
     initializeMobileAds().catch(() => undefined);
     initializeCooldownNotifications().catch(() => undefined);
   }, []);
+  useEffect(() => subscribeToCooldownNotificationLinks((url) => router.push(url as never)), [router]);
 
   return (
     <SafeAreaProvider>

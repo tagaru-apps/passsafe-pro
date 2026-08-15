@@ -2,6 +2,7 @@ import { Platform } from "react-native";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
 
 import { isProEntitlementActive } from "@/lib/revenuecat-policy";
+import { getRecoveryOfferingId } from "@/lib/revenuecat-offer";
 
 export type ProPackage = { identifier: string; title: string; description: string; price: string };
 export type PurchaseOutcome = { isPro: boolean; cancelled: boolean; message?: string };
@@ -24,19 +25,20 @@ export async function configureRevenueCat() {
   return true;
 }
 
-export async function getRevenueCatSnapshot(): Promise<{ configured: boolean; isPro: boolean; packages: ProPackage[] }> {
+function packagesFor(items: { identifier: string; product: { title: string; description: string; priceString: string } }[]): ProPackage[] {
+  return items.map((item) => ({ identifier: item.identifier, title: item.product.title, description: item.product.description, price: item.product.priceString }));
+}
+
+export async function getRevenueCatSnapshot(): Promise<{ configured: boolean; isPro: boolean; packages: ProPackage[]; promoPackages: ProPackage[] }> {
   const ready = await configureRevenueCat();
-  if (!ready) return { configured: false, isPro: false, packages: [] };
+  if (!ready) return { configured: false, isPro: false, packages: [], promoPackages: [] };
   const [customerInfo, offerings] = await Promise.all([Purchases.getCustomerInfo(), Purchases.getOfferings()]);
+  const promoOffering = offerings.all[getRecoveryOfferingId()];
   return {
     configured: true,
     isPro: isProEntitlementActive(customerInfo.entitlements.active),
-    packages: (offerings.current?.availablePackages ?? []).map((item) => ({
-      identifier: item.identifier,
-      title: item.product.title,
-      description: item.product.description,
-      price: item.product.priceString,
-    })),
+    packages: packagesFor(offerings.current?.availablePackages ?? []),
+    promoPackages: packagesFor(promoOffering?.availablePackages ?? []),
   };
 }
 
@@ -44,7 +46,7 @@ export async function purchaseProPackage(identifier: string): Promise<PurchaseOu
   const ready = await configureRevenueCat();
   if (!ready) return { isPro: false, cancelled: false, message: "Subscriptions are not configured for this build." };
   const offerings = await Purchases.getOfferings();
-  const purchasePackage = offerings.current?.availablePackages.find((item) => item.identifier === identifier);
+  const purchasePackage = Object.values(offerings.all).flatMap((offering) => offering.availablePackages).find((item) => item.identifier === identifier);
   if (!purchasePackage) return { isPro: false, cancelled: false, message: "This subscription option is no longer available." };
   try {
     const { customerInfo } = await Purchases.purchasePackage(purchasePackage);
