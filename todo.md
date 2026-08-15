@@ -11,3 +11,4 @@
 - [x] Add automated tests and run TypeScript, lint, and user-flow validation.
 - [x] Generate and configure the custom PassSafe Pro launcher icon before the delivery checkpoint.
 - [x] Refine every React Native screen for compact, standard, and large portrait emulator layouts.
+- [x] Move top screen content below iPhone camera cutouts and Dynamic Island safe areas.

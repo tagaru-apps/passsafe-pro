@@ -1,8 +1,9 @@
 import { View, type ViewProps } from "react-native";
 import { Platform, StyleSheet } from "react-native";
-import { SafeAreaView, type Edge } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets, type Edge } from "react-native-safe-area-context";
 
 import { cn } from "@/lib/utils";
+import { getTopContentInset } from "@/lib/layout";
 
 export const APP_CONTENT_MAX_WIDTH = 520;
 
@@ -50,12 +51,16 @@ export function ScreenContainer({
   style,
   ...props
 }: ScreenContainerProps) {
+  const insets = useSafeAreaInsets();
+  const includesTopInset = edges.includes("top");
+  const safeAreaEdges = edges.filter((edge) => edge !== "top") as Edge[];
+
   return (
     <View className={cn("flex-1", "bg-background", containerClassName)} style={styles.outer} {...props}>
       <SafeAreaView
-        edges={edges}
+        edges={safeAreaEdges}
         className={cn("flex-1", safeAreaClassName)}
-        style={[styles.frame, style]}
+        style={[styles.frame, includesTopInset && { paddingTop: getTopContentInset(insets.top) }, style]}
       >
         <View className={cn("flex-1", className)}>{children}</View>
       </SafeAreaView>

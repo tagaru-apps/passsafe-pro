@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { APP_CONTENT_MAX_WIDTH, getPageHorizontalPadding, isCompactDevice } from "@/lib/layout";
+import { APP_CONTENT_MAX_WIDTH, getPageHorizontalPadding, getTopContentInset, isCompactDevice } from "@/lib/layout";
 
 describe("PassSafe responsive layout rules", () => {
   it("keeps the application frame at a mobile-readable width on wide displays", () => {
@@ -16,5 +16,10 @@ describe("PassSafe responsive layout rules", () => {
   it("identifies compact portrait emulators for reduced vertical spacing", () => {
     expect(isCompactDevice(320, 568)).toBe(true);
     expect(isCompactDevice(390, 844)).toBe(false);
+  });
+
+  it("preserves a device cutout inset and adds a minimum clear zone when none is reported", () => {
+    expect(getTopContentInset(59)).toBe(59);
+    expect(getTopContentInset(0)).toBe(18);
   });
 });

@@ -9,3 +9,7 @@ export function getPageHorizontalPadding(width: number): number {
 export function isCompactDevice(width: number, height: number): boolean {
   return width < 360 || height < 680;
 }
+
+export function getTopContentInset(systemTopInset: number): number {
+  return Math.max(systemTopInset, 18);
+}
