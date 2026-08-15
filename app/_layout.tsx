@@ -4,11 +4,13 @@ import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { PassSafeProvider } from "@/lib/passsafe-context";
+import { initializeCooldownNotifications } from "@/lib/cooldown-notifications";
 import { initializeMobileAds } from "@/lib/mobile-ads";
 
 export default function RootLayout() {
   useEffect(() => {
     initializeMobileAds().catch(() => undefined);
+    initializeCooldownNotifications().catch(() => undefined);
   }, []);
 
   return (

@@ -3,9 +3,10 @@ import { createContext, useContext, useEffect, useMemo, useState, type PropsWith
 
 import { type AppLanguage, type CertTrack, uiCopy } from "@/lib/passsafe-data";
 import { canAnswerQuestion } from "@/lib/entitlement-policy";
+import { type RewardEvent } from "@/lib/reward-summary";
 
 type TopicProgress = Record<string, { total: number; correct: number }>;
-type Usage = { date: string; answeredToday: number; rewardedUnlocks: number; isPro: boolean; proSince: string | null };
+type Usage = { date: string; answeredToday: number; rewardedUnlocks: number; rewardEvents: RewardEvent[]; recoveryOfferStartedAt: string | null; isPro: boolean; proSince: string | null };
 
 type PassSafeContextValue = {
   hydrated: boolean;
@@ -24,6 +25,7 @@ type PassSafeContextValue = {
   canAnswer: () => boolean;
   incrementUsage: () => Promise<void>;
   unlockRewarded: () => Promise<void>;
+  markRecoveryOffer: () => Promise<void>;
   setPro: (value: boolean) => Promise<void>;
   setNotificationsEnabled: (value: boolean) => Promise<void>;
   resetLearner: () => Promise<void>;
@@ -36,7 +38,7 @@ const keys = {
 };
 
 const todayString = () => new Date().toISOString().slice(0, 10);
-const defaultUsage = (): Usage => ({ date: todayString(), answeredToday: 0, rewardedUnlocks: 0, isPro: false, proSince: null });
+const defaultUsage = (): Usage => ({ date: todayString(), answeredToday: 0, rewardedUnlocks: 0, rewardEvents: [], recoveryOfferStartedAt: null, isPro: false, proSince: null });
 const defaultPreferences = { language: "en" as AppLanguage, certTrack: "manager" as CertTrack, examDate: "", hasCompletedOnboarding: false, notificationsEnabled: false };
 
 const PassSafeContext = createContext<PassSafeContextValue | null>(null);
@@ -57,8 +59,9 @@ export function PassSafeProvider({ children }: PropsWithChildren) {
       if (storedPreferences) setPreferences({ ...defaultPreferences, ...JSON.parse(storedPreferences) });
       if (storedProgress) setProgress(JSON.parse(storedProgress));
       if (storedUsage) {
-        const parsed = JSON.parse(storedUsage) as Usage;
-        setUsage(parsed.date === todayString() ? parsed : { ...parsed, date: todayString(), answeredToday: 0, rewardedUnlocks: 0 });
+        const parsed = JSON.parse(storedUsage) as Partial<Usage>;
+        const normalized: Usage = { ...defaultUsage(), ...parsed, rewardEvents: parsed.rewardEvents ?? [] };
+        setUsage(normalized.date === todayString() ? normalized : { ...normalized, date: todayString(), answeredToday: 0, rewardedUnlocks: 0 });
       }
       setHydrated(true);
     };
@@ -102,7 +105,8 @@ export function PassSafeProvider({ children }: PropsWithChildren) {
     },
     canAnswer: () => canAnswerQuestion(usage),
     incrementUsage: async () => persistUsage({ ...usage, answeredToday: usage.answeredToday + 1 }),
-    unlockRewarded: async () => persistUsage({ ...usage, rewardedUnlocks: usage.rewardedUnlocks + 1 }),
+    unlockRewarded: async () => persistUsage({ ...usage, rewardedUnlocks: usage.rewardedUnlocks + 1, rewardEvents: [...usage.rewardEvents, { date: todayString(), questions: 10 }].slice(-80) }),
+    markRecoveryOffer: async () => persistUsage({ ...usage, recoveryOfferStartedAt: new Date().toISOString() }),
     setPro: async (value) => persistUsage({ ...usage, isPro: value, proSince: value ? new Date().toISOString() : null }),
     setNotificationsEnabled: async (notificationsEnabled) => persistPreferences({ ...preferences, notificationsEnabled }),
     resetLearner: async () => {

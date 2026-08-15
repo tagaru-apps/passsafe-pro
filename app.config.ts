@@ -101,6 +101,12 @@ const config: ExpoConfig = {
       },
     ],
     [
+      "expo-notifications",
+      {
+        defaultChannel: "reward-cooldowns",
+      },
+    ],
+    [
       "expo-audio",
       {
         microphonePermission: "Allow $(PRODUCT_NAME) to access your microphone.",
