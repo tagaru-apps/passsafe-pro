@@ -23,6 +23,7 @@ export default function RootLayout() {
           <Stack.Screen name="topic" options={{ animation: "slide_from_right" }} />
           <Stack.Screen name="session" options={{ animation: "slide_from_bottom" }} />
           <Stack.Screen name="result" options={{ animation: "fade" }} />
+          <Stack.Screen name="pro" options={{ animation: "slide_from_bottom" }} />
         </Stack>
       </PassSafeProvider>
     </SafeAreaProvider>

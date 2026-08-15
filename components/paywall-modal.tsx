@@ -1,5 +1,6 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { SecondaryButton, colors } from "@/components/passsafe-ui";
@@ -8,7 +9,8 @@ import { usePassSafe } from "@/lib/passsafe-context";
 import { showRewardedQuestionUnlock } from "@/lib/mobile-ads";
 
 export function PaywallModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
-  const { usage, unlockRewarded, setPro } = usePassSafe();
+  const router = useRouter();
+  const { usage, unlockRewarded } = usePassSafe();
   const [playing, setPlaying] = useState(false);
   const [rewardError, setRewardError] = useState(false);
   const watchReward = async () => {
@@ -26,7 +28,7 @@ export function PaywallModal({ visible, onClose }: { visible: boolean; onClose: 
     setPlaying(false);
     setRewardError(true);
   };
-  const goPro = async () => { await setPro(true); haptic.success(); onClose(); };
+  const goPro = () => { onClose(); router.push("/pro" as never); };
   useEffect(() => { if (!visible) setPlaying(false); }, [visible]);
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>

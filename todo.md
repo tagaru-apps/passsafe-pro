@@ -18,3 +18,4 @@
 - [ ] Implement the supplied daily free-limit and rewarded-unlock entitlement policy as a dedicated hook.
 - [x] Add native Google Mobile Ads banner and interstitial placements with web-safe fallbacks.
 - [x] Connect rewarded AdMob completion to the 10-question free-limit unlock policy.
+- [x] Create a RevenueCat-backed Pro subscription paywall with purchase and restore actions.
