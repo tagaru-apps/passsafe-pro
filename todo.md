@@ -34,3 +34,6 @@
 - [x] Deep link cooldown-complete notifications to the Home rewarded-ad section.
 - [x] Add a daily trend chart to the weekly rewarded-question summary modal.
 - [x] Connect the recovery countdown to a configured RevenueCat promotional offering.
+- [x] Diagnose the APK publishing and local-device testing blockage.
+- [x] Diagnose Expo Android/Gradle configuration, service health, and available APK publishing logs.
+- [x] Align Expo SDK 54 package versions and prepare the project for supported APK publishing.
